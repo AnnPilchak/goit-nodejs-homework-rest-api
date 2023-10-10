@@ -25,7 +25,7 @@ const addContact = async (req, res) => {
 const updateContactById = async (req, res) => {
   const { contactId } = req.params;
 
-  const result = await contactsService.updateContactById(contactId, req.body);
+  const result = await contactsService.updateContacts(contactId, req.body);
   if (!result) {
     throw HttpError(404, `Not found`);
   }
