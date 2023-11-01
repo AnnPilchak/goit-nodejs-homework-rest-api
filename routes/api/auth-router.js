@@ -14,12 +14,12 @@ const userSigninValidate = validateBody(userSigninSchema);
 
 const authRouter = express.Router();
 
-authRouter.post("/signup", isEmptyBody, userSignupValidate, authController.signup);
+authRouter.post("/register", isEmptyBody, userSignupValidate, authController.register);
 
-authRouter.post("/signin", isEmptyBody, userSigninValidate, authController.signin);
+authRouter.post("/login", isEmptyBody, userSigninValidate, authController.login);
 
 authRouter.get("/current", authenticate, authController.current);
 
-authRouter.post("/signout", authenticate, authController.signout);
+authRouter.post("/logout", authenticate, authController.logout);
 
 export default authRouter;
