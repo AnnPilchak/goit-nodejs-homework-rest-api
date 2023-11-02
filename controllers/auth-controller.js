@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-import User from "../models/Contact.js";
+import User from "../models/User.js";
 
 import { HttpError } from "../helpers/index.js";
 
@@ -18,11 +18,11 @@ const register = async (req, res) => {
     
     const hashPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({...req.body, password: hashPassword});
+    await User.create({...req.body, password: hashPassword});
 
     res.status(201).json({
-        email: newUser.email,
-        subscription: newUser.subscription,
+        email,
+        subscription: 'starter',
     })
 }
 
@@ -42,11 +42,15 @@ const login = async (req, res) => {
         id: user._id,
     }
 
-    const token = jwt.log(payload, JWT_SECRET, { expiresIn: "23h" });
-    await User.findByIdAndUpdate(user._id, { token });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '23h' });
+    const loggedUser = await User.findByIdAndUpdate(user._id, { token });
 
-    res.json({
+    res.status(200).json({
         token,
+        user: {
+            email: loggedUser.email,
+            subscription: loggedUser.subscription,
+        }
     })
 }
 
@@ -62,7 +66,7 @@ const logout = async (req, res) => {
   const { _id } = req.user;
   await User.findByIdAndUpdate(_id, { token: "" });
 
-  res.status(204);
+  res.status(204).json();
 };
 
 export default {
