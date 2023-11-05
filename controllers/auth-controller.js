@@ -1,10 +1,11 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import gravatar from "gravatar";
 
 import User from "../models/User.js";
 
 import { HttpError } from "../helpers/index.js";
-
+import { updateAvatar } from "../middlewares/index.js";
 import { ctrlWrapper } from "../decorators/index.js";
 
 const { JWT_SECRET } = process.env;
@@ -17,8 +18,10 @@ const register = async (req, res) => {
     }
     
     const hashPassword = await bcrypt.hash(password, 10);
+    
+    const avatarURL = gravatar.url(email, { s: '250', d: 'retro' });
 
-    await User.create({...req.body, password: hashPassword});
+    await User.create({...req.body, password: hashPassword, avatarURL});
 
     res.status(201).json({
         email,
@@ -69,9 +72,22 @@ const logout = async (req, res) => {
   res.status(204).json();
 };
 
+const uploadAvatar = async (req, res) => {
+    const { _id } = req.user;
+    const { buffer } = req.file;
+    
+    const avatarURL = await updateAvatar(buffer, _id);
+    await User.findByIdAndUpdate(_id, { avatarURL });
+
+    res.status(200).json({
+        avatarURL, 
+    })
+}
+
 export default {
     register: ctrlWrapper(register),
     login: ctrlWrapper(login),
     current: ctrlWrapper(current),
     logout: ctrlWrapper(logout),
+    uploadAvatar: ctrlWrapper(uploadAvatar)
 }

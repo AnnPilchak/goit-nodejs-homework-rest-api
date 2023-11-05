@@ -1,7 +1,7 @@
 import express from "express";
 import contactsController from "../../controllers/contacts-controller.js";
 
-import { authenticate, isEmptyBody, isValidId } from "../../middlewares/index.js";
+import { authenticate, upload, isEmptyBody, isValidId } from "../../middlewares/index.js";
 
 import { validateBody, validateFavorite } from "../../decorators/index.js";
 
@@ -18,7 +18,7 @@ contactsRouter.get("/", contactsController.listContacts);
 
 contactsRouter.get("/:contactId", isValidId, contactsController.getContactById);
 
-contactsRouter.post("/", isEmptyBody, contactsAddValidate, contactsController.addContact);
+contactsRouter.post("/", upload.single("avatar"), isEmptyBody, contactsAddValidate, contactsController.addContact);
 
 contactsRouter.delete("/:contactId", isValidId, contactsController.removeContact);
 
