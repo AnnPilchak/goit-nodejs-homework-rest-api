@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import 'dotenv/config';
 
-const { META_UA_EMAIL, META_UA_PASSWORD } = process.env;
+const { META_UA_PASSWORD, META_UA_EMAIL } = process.env;
 
 const nodemailerConfig = {
   host: 'smtp.meta.ua',

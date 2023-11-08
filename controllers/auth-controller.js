@@ -24,13 +24,20 @@ const register = async (req, res) => {
     const avatarURL = gravatar.url(email, { s: '250', d: 'retro' });
     const verificationToken = nanoid();
 
-    await User.create({...req.body, password: hashPassword, avatarURL, verificationToken});
+    await User.create({ ...req.body, email, password: hashPassword, avatarURL, verificationToken });
+
+    const verifyEmail = {
+        to: email,
+        subject: 'Verify email',
+        html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click to verify email</a>`,
+    };
+    await sendEmail(verifyEmail);
 
     res.status(201).json({
         email,
         subscription: 'starter',
-    })
-}
+    });
+};
 
 const login = async (req, res) => {
     const { email, password } = req.body;
@@ -62,7 +69,7 @@ const login = async (req, res) => {
             subscription: loggedUser.subscription,
         }
     })
-}
+};
 
 const current = async (req, res) => {
     const { email, subscription } = req.user;
@@ -87,7 +94,7 @@ const uploadAvatar = async (req, res) => {
     await User.findByIdAndUpdate(_id, { avatarURL });
 
     res.status(200).json({
-        avatarURL, 
+        avatarURL,
     })
 }
 
